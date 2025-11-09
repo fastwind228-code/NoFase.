@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoFace - Anonymous Forum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .tagline {
+            color: #718096;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #e53e3e;
+            font-weight: 500;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .logo {
+                position: static;
+                transform: none;
+                margin-bottom: 10px;
+            }
+        }
+
+        .create-thread {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .threads-list {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fc8181, #f56565);
+            color: white;
+        }
+
+        .thread-item {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .thread-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .thread-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .thread-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            flex: 1;
+        }
+
+        .thread-meta {
+            display: flex;
+            gap: 15px;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .thread-content {
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .thread-preview {
+            color: #718096;
+            font-size: 0.95em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .nsfw-badge {
+            background: #f56565;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .comment {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .comment-time {
+            color: #a0aec0;
+            font-size: 0.9em;
+        }
+
+        .comment-content {
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .rules-list {
+            list-style: none;
+        }
+
+        .rules-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        .rules-list li:last-child {
+            border-bottom: none;
+        }
+
+        .rules-list li::before {
+            content: "⚠️";
+            margin-right: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .thread-view {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .comments-section {
+            margin-top: 25px;
+        }
+
+        .add-comment {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .admin-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: right;
+        }
+
+        .admin-btn {
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .blurred {
+            filter: blur(5px);
+            user-select: none;
+        }
+
+        .nsfw-warning {
+            text-align: center;
+            padding: 20px;
+            background: #fed7d7;
+            border-radius: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .user-id-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .my-comment {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .creator-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: right;
+        }
+
+        .refresh-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: #38a169;
+        }
+
+        .last-update {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        .auto-update-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Главная страница -->
+        <div id="mainPage">
+            <div class="header">
+                <div class="logo">NoFace</div>
+                <h1>🕶️ Анонимный Форум</h1>
+                <p class="tagline">Говори то, что думаешь. Без имени, без следа.</p>
+            </div>
+
+            <div class="warning-banner">
+                ⚠️ Внимание: Вы находитесь в анонимном пространстве. Все сообщения автоматически удаляются через 30 дней. 
+                Соблюдайте правила сообщества.
+            </div>
+
+            <div class="main-content">
+                <div>
+                    <div class="create-thread">
+                        <h2 style="margin-bottom: 20px; color: #4a5568;">💬 Создать новое обсуждение</h2>
+                        <div class="form-group">
+                            <label for="threadTitle">Заголовок:</label>
+                            <input type="text" id="threadTitle" class="form-control" placeholder="О чём хотите поговорить?">
+                        </div>
+                        <div class="form-group">
+                            <label for="threadContent">Текст обсуждения:</label>
+                            <textarea id="threadContent" class="form-control" placeholder="Опишите вашу тему подробнее..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="nsfwCheckbox" style="margin-right: 10px;">
+                                <span>Пометить как NSFW (18+)</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="createThread()">📝 Создать обсуждение</button>
+                    </div>
+
+                    <div class="threads-list">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="color: #4a5568; margin: 0;">
+                                <span class="auto-update-indicator"></span>📋 Активные обсуждения
+                            </h2>
+                            <button class="refresh-btn" onclick="loadThreads()">🔄 Обновить</button>
+                        </div>
+                        <div id="threadsContainer">
+                            <!-- Список тредов будет здесь -->
+                        </div>
+                        <div class="last-update" id="threadsLastUpdate">
+                            Обновлено: только что
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <h3 style="margin-bottom: 15px; color: #4a5568;">📜 Правила сообщества</h3>
+                    <ul class="rules-list">
+                        <li>Запрещены прямые угрозы жизни и здоровью</li>
+                        <li>Запрещено разжигание ненависти</li>
+                        <li>Запрещены призывы к суициду</li>
+                        <li>Запрещена детская порнография</li>
+                        <li>Запрещено распространение личных данных</li>
+                        <li>Запрещены спам и мошенничество</li>
+                    </ul>
+                    
+                    <div style="margin-top: 25px; padding: 15px; background: #edf2f7; border-radius: 10px;">
+                        <h4 style="margin-bottom: 10px; color: #4a5568;">ℹ️ Как это работает</h4>
+                        <p style="color: #718096; font-size: 0.9em;">
+                            • Создавайте обсуждения анонимно<br>
+                            • В каждом обсуждении у вас уникальный ID<br>
+                            • Комментарии видны всем пользователям<br>
+                            • <strong>Автообновление каждую секунду</strong><br>
+                            • Данные хранятся локально в браузере
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница просмотра треда -->
+        <div id="threadPage" class="hidden">
+            <div class="back-button">
+                <button class="btn btn-secondary" onclick="showMainPage()">← Назад к списку</button>
+            </div>
+            
+            <div class="thread-view">
+                <div id="threadViewContent">
+                    <!-- Содержимое треда будет здесь -->
+                </div>
+                
+                <div class="comments-section">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #4a5568; margin: 0;">
+                            <span class="auto-update-indicator"></span>💭 Комментарии
+                        </h3>
+                        <button class="refresh-btn" onclick="loadCurrentThreadComments()">🔄 Обновить</button>
+                    </div>
+                    
+                    <div class="add-comment">
+                        <div class="form-group">
+                            <textarea id="commentContent" class="form-control" placeholder="Напишите ваш комментарий..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="addComment()">📨 Отправить комментарий</button>
+                        <div style="font-size: 0.8em; color: #718096; margin-top: 5px;">
+                            Ctrl+Enter для быстрой отправки
+                        </div>
+                    </div>
+                    
+                    <div id="commentsContainer">
+                        <!-- Комментарии будут здесь -->
+                    </div>
+                    <div class="last-update" id="commentsLastUpdate">
+                        Обновлено: только что
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация данных
+        function initializeData() {
+            if (!localStorage.getItem('anonymousForumThreads')) {
+                // Начинаем с пустого массива вместо примеров
+                localStorage.setItem('anonymousForumThreads', JSON.stringify([]));
+            }
+
+            // Инициализация ID пользователя
+            if (!localStorage.getItem('userUniqueId')) {
+                localStorage.setItem('userUniqueId', 'user_' + Math.random().toString(36).substr(2, 9));
+            }
+        }
+
+        // Получение ID пользователя для конкретного треда
+        function getUserIdForThread(threadId) {
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const thread = threads.find(t => t.id === threadId);
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            
+            if (!thread) return generateAnonymousId();
+            
+            // Если у пользователя уже есть ID в этом треде, возвращаем его
+            if (thread.userIds && thread.userIds[userUniqueId]) {
+                return thread.userIds[userUniqueId];
+            }
+            
+            // Иначе генерируем новый ID и сохраняем
+            const newAnonymousId = generateAnonymousId();
+            if (!thread.userIds) thread.userIds = {};
+            thread.userIds[userUniqueId] = newAnonymousId;
+            
+            localStorage.setItem('anonymousForumThreads', JSON.stringify(threads));
+            return newAnonymousId;
+        }
+
+        // Проверка, является ли пользователь создателем треда
+        function isThreadCreator(threadId) {
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const thread = threads.find(t => t.id === threadId);
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            
+            return thread && thread.creatorId === userUniqueId;
+        }
+
+        // Проверка, является ли пользователь автором комментария
+        function isCommentAuthor(comment) {
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            return comment.authorId === userUniqueId;
+        }
+
+        // Генерация случайного ID для анонима
+        function generateAnonymousId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = 'Аноним #';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Генерация ID для сущностей
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        }
+
+        // Получение форматированного времени
+        function getFormattedTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'только что';
+            if (minutes < 60) return `${minutes} мин назад`;
+            if (hours < 24) return `${hours} ч назад`;
+            if (days < 7) return `${days} дн назад`;
+            
+            return new Date(timestamp).toLocaleDateString('ru-RU');
+        }
+
+        // Получение текущего времени для отображения
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('ru-RU');
+        }
+
+        // Создание нового треда
+        function createThread() {
+            const title = document.getElementById('threadTitle').value.trim();
+            const content = document.getElementById('threadContent').value.trim();
+            const nsfw = document.getElementById('nsfwCheckbox').checked;
+            
+            if (!title) {
+                alert('Пожалуйста, введите заголовок обсуждения');
+                return;
+            }
+            
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            const userAnonymousId = generateAnonymousId();
+            
+            const newThread = {
+                id: generateId(),
+                title: title,
+                content: content,
+                timestamp: Date.now(),
+                nsfw: nsfw,
+                creatorId: userUniqueId,
+                userIds: {
+                    [userUniqueId]: userAnonymousId
+                },
+                comments: []
+            };
+            
+            threads.unshift(newThread);
+            localStorage.setItem('anonymousForumThreads', JSON.stringify(threads));
+            
+            // Очистка формы
+            document.getElementById('threadTitle').value = '';
+            document.getElementById('threadContent').value = '';
+            document.getElementById('nsfwCheckbox').checked = false;
+            
+            // Обновление списка
+            loadThreads();
+            
+            showTempMessage('Обсуждение создано! Ваш ID: ' + userAnonymousId);
+        }
+
+        // Загрузка списка тредов
+        function loadThreads() {
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const container = document.getElementById('threadsContainer');
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            
+            // Обновляем время последнего обновления
+            document.getElementById('threadsLastUpdate').textContent = 'Обновлено: ' + getCurrentTime();
+            
+            if (threads.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Пока нет обсуждений</h3>
+                        <p>Будьте первым, кто создаст новую тему для разговора!</p>
+                        <p style="margin-top: 10px; font-size: 0.9em; color: #a0aec0;">
+                            Создайте обсуждение выше и поделитесь ссылкой с друзьями
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = threads.map(thread => {
+                const isCreator = thread.creatorId === userUniqueId;
+                const userAnonymousId = thread.userIds && thread.userIds[userUniqueId];
+                
+                return `
+                <div class="thread-item" onclick="openThread('${thread.id}')">
+                    <div class="thread-header">
+                        <div class="thread-title">
+                            ${thread.title}
+                            ${thread.nsfw ? '<span class="nsfw-badge">NSFW</span>' : ''}
+                            ${userAnonymousId ? `<span class="user-id-badge">${userAnonymousId}</span>` : ''}
+                        </div>
+                        <div class="thread-meta">
+                            <span>💬 ${thread.comments.length}</span>
+                            <span>🕒 ${getFormattedTime(thread.timestamp)}</span>
+                        </div>
+                    </div>
+                    <div class="thread-content">
+                        <div class="thread-preview">${thread.content || 'Без дополнительного текста'}</div>
+                    </div>
+                    ${isCreator ? `
+                    <div class="creator-controls">
+                        <button class="admin-btn" onclick="event.stopPropagation(); deleteThread('${thread.id}')">🗑️ Удалить обсуждение</button>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Фильтрация тредов
+        function filterThreads() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const container = document.getElementById('threadsContainer');
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            
+            const filteredThreads = threads.filter(thread => 
+                thread.title.toLowerCase().includes(searchTerm) || 
+                thread.content.toLowerCase().includes(searchTerm)
+            );
+            
+            if (filteredThreads.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Ничего не найдено</h3>
+                        <p>Попробуйте изменить поисковый запрос</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredThreads.map(thread => {
+                const isCreator = thread.creatorId === userUniqueId;
+                const userAnonymousId = thread.userIds && thread.userIds[userUniqueId];
+                
+                return `
+                <div class="thread-item" onclick="openThread('${thread.id}')">
+                    <div class="thread-header">
+                        <div class="thread-title">
+                            ${thread.title}
+                            ${thread.nsfw ? '<span class="nsfw-badge">NSFW</span>' : ''}
+                            ${userAnonymousId ? `<span class="user-id-badge">${userAnonymousId}</span>` : ''}
+                        </div>
+                        <div class="thread-meta">
+                            <span>💬 ${thread.comments.length}</span>
+                            <span>🕒 ${getFormattedTime(thread.timestamp)}</span>
+                        </div>
+                    </div>
+                    <div class="thread-content">
+                        <div class="thread-preview">${thread.content || 'Без дополнительного текста'}</div>
+                    </div>
+                    ${isCreator ? `
+                    <div class="creator-controls">
+                        <button class="admin-btn" onclick="event.stopPropagation(); deleteThread('${thread.id}')">🗑️ Удалить обсуждение</button>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Открытие треда
+        function openThread(threadId) {
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const thread = threads.find(t => t.id === threadId);
+            
+            if (!thread) {
+                alert('Обсуждение не найдено');
+                return;
+            }
+            
+            const userAnonymousId = getUserIdForThread(threadId);
+            const isCreator = isThreadCreator(threadId);
+            
+            const threadContent = document.getElementById('threadViewContent');
+            threadContent.innerHTML = `
+                <div class="thread-item">
+                    <div class="thread-header">
+                        <div class="thread-title">
+                            ${thread.title}
+                            ${thread.nsfw ? '<span class="nsfw-badge">NSFW</span>' : ''}
+                            <span class="user-id-badge">Ваш ID: ${userAnonymousId}</span>
+                        </div>
+                        <div class="thread-meta">
+                            <span>🕒 ${getFormattedTime(thread.timestamp)}</span>
+                            <span>💬 ${thread.comments.length} комментариев</span>
+                        </div>
+                    </div>
+                    <div class="thread-content">
+                        ${thread.nsfw ? `
+                            <div class="nsfw-warning" onclick="this.nextElementSibling.classList.toggle('blurred'); this.style.display='none'">
+                                ⚠️ Контент помечен как NSFW (18+). Нажмите для просмотра.
+                            </div>
+                            <div class="blurred">${thread.content || 'Без дополнительного текста'}</div>
+                        ` : (thread.content || 'Без дополнительного текста')}
+                    </div>
+                    ${isCreator ? `
+                    <div class="creator-controls">
+                        <button class="admin-btn" onclick="deleteThread('${thread.id}')">🗑️ Удалить обсуждение</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Загрузка комментариев
+            loadComments(threadId);
+            
+            // Сохранение текущего треда
+            localStorage.setItem('currentThreadId', threadId);
+            
+            // Переключение на страницу треда
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('threadPage').classList.remove('hidden');
+        }
+
+        // Загрузка комментариев текущего треда
+        function loadCurrentThreadComments() {
+            const threadId = localStorage.getItem('currentThreadId');
+            if (threadId) {
+                loadComments(threadId);
+            }
+        }
+
+        // Загрузка комментариев
+        function loadComments(threadId) {
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const thread = threads.find(t => t.id === threadId);
+            const container = document.getElementById('commentsContainer');
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            
+            // Обновляем время последнего обновления
+            document.getElementById('commentsLastUpdate').textContent = 'Обновлено: ' + getCurrentTime();
+            
+            if (!thread || thread.comments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Пока нет комментариев</h3>
+                        <p>Будьте первым, кто оставит комментарий!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Сортируем комментарии по времени (новые сверху)
+            const sortedComments = [...thread.comments].sort((a, b) => b.timestamp - a.timestamp);
+            
+            container.innerHTML = sortedComments.map(comment => {
+                const isAuthor = comment.authorId === userUniqueId;
+                const isCreator = isThreadCreator(threadId);
+                
+                return `
+                <div class="comment ${isAuthor ? 'my-comment' : ''}">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            ${comment.author}
+                            ${isAuthor ? ' <span style="color:#667eea;">(Вы)</span>' : ''}
+                        </div>
+                        <div class="comment-time">${getFormattedTime(comment.timestamp)}</div>
+                    </div>
+                    <div class="comment-content">${comment.content}</div>
+                    ${(isAuthor || isCreator) ? `
+                    <div class="admin-controls">
+                        <button class="admin-btn" onclick="deleteComment('${threadId}', '${comment.id}')">🗑️ Удалить</button>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Добавление комментария
+        function addComment() {
+            const threadId = localStorage.getItem('currentThreadId');
+            const content = document.getElementById('commentContent').value.trim();
+            
+            if (!content) {
+                alert('Пожалуйста, введите текст комментария');
+                return;
+            }
+            
+            if (!threadId) {
+                alert('Ошибка: обсуждение не найдено');
+                return;
+            }
+            
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const threadIndex = threads.findIndex(t => t.id === threadId);
+            
+            if (threadIndex === -1) {
+                alert('Обсуждение не найдено');
+                return;
+            }
+            
+            const userUniqueId = localStorage.getItem('userUniqueId');
+            const userAnonymousId = getUserIdForThread(threadId);
+            
+            const newComment = {
+                id: generateId(),
+                authorId: userUniqueId,
+                author: userAnonymousId,
+                content: content,
+                timestamp: Date.now()
+            };
+            
+            threads[threadIndex].comments.push(newComment);
+            localStorage.setItem('anonymousForumThreads', JSON.stringify(threads));
+            
+            // Очистка поля и обновление комментариев
+            document.getElementById('commentContent').value = '';
+            loadComments(threadId);
+            
+            // Показываем подтверждение
+            showTempMessage('Комментарий добавлен!');
+        }
+
+        // Временное сообщение
+        function showTempMessage(message) {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #48bb78;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                z-index: 1000;
+                font-weight: 600;
+            `;
+            tempDiv.textContent = message;
+            document.body.appendChild(tempDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(tempDiv);
+            }, 3000);
+        }
+
+        // Удаление треда
+        function deleteThread(threadId) {
+            if (!confirm('Вы уверены, что хотите удалить это обсуждение? Все комментарии также будут удалены.')) {
+                return;
+            }
+            
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const filteredThreads = threads.filter(t => t.id !== threadId);
+            
+            localStorage.setItem('anonymousForumThreads', JSON.stringify(filteredThreads));
+            
+            if (localStorage.getItem('currentThreadId') === threadId) {
+                showMainPage();
+            }
+            
+            loadThreads();
+            showTempMessage('Обсуждение удалено');
+        }
+
+        // Удаление комментария
+        function deleteComment(threadId, commentId) {
+            if (!confirm('Удалить этот комментарий?')) {
+                return;
+            }
+            
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const threadIndex = threads.findIndex(t => t.id === threadId);
+            
+            if (threadIndex !== -1) {
+                threads[threadIndex].comments = threads[threadIndex].comments.filter(c => c.id !== commentId);
+                localStorage.setItem('anonymousForumThreads', JSON.stringify(threads));
+                loadComments(threadId);
+                showTempMessage('Комментарий удален');
+            }
+        }
+
+        // Показать главную страницу
+        function showMainPage() {
+            document.getElementById('mainPage').classList.remove('hidden');
+            document.getElementById('threadPage').classList.add('hidden');
+            localStorage.removeItem('currentThreadId');
+        }
+
+        // Очистка старых данных (автоматическое удаление через 30 дней)
+        function cleanupOldData() {
+            const threads = JSON.parse(localStorage.getItem('anonymousForumThreads') || '[]');
+            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+            
+            const activeThreads = threads.filter(thread => thread.timestamp > thirtyDaysAgo);
+            
+            if (activeThreads.length !== threads.length) {
+                localStorage.setItem('anonymousForumThreads', JSON.stringify(activeThreads));
+                console.log('Удалены устаревшие обсуждения');
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+            cleanupOldData();
+            loadThreads();
+            
+            // Обработка Enter для создания треда
+            document.getElementById('threadTitle').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    createThread();
+                }
+            });
+
+            // Обработка Ctrl+Enter для комментария
+            document.getElementById('commentContent').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    addComment();
+                }
+            });
+
+            // Автообновление каждую секунду
+            setInterval(() => {
+                if (!localStorage.getItem('currentThreadId')) {
+                    // На главной странице - обновляем список тредов
+                    loadThreads();
+                } else {
+                    // На странице треда - обновляем комментарии
+                    loadCurrentThreadComments();
+                }
+            }, 1000); // 1000 мс = 1 секунда
+        });
+    </script>
+</body>
+</html>
