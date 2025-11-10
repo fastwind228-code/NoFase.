@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoFace - Анонимный Форум</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .logo {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4a5568;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .tagline {
+            color: #718096;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, #fed7d7, #feb2b2);
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #e53e3e;
+            font-weight: 500;
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            gap: 10px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            background: #e2e8f0;
+            color: #4a5568;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #cbd5e0;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            .logo {
+                position: static;
+                transform: none;
+                margin-bottom: 10px;
+            }
+            .tabs {
+                flex-wrap: wrap;
+            }
+        }
+
+        .create-thread {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .threads-list {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fc8181, #f56565);
+            color: white;
+        }
+
+        .thread-item {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .thread-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .thread-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .thread-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 8px;
+            flex: 1;
+        }
+
+        .thread-meta {
+            display: flex;
+            gap: 15px;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .thread-content {
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .thread-preview {
+            color: #718096;
+            font-size: 0.95em;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .nsfw-badge {
+            background: #f56565;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .comment {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .comment-time {
+            color: #a0aec0;
+            font-size: 0.9em;
+        }
+
+        .comment-content {
+            color: #2d3748;
+            line-height: 1.5;
+        }
+
+        .rules-list {
+            list-style: none;
+        }
+
+        .rules-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+        }
+
+        .rules-list li:last-child {
+            border-bottom: none;
+        }
+
+        .rules-list li::before {
+            content: "⚠️";
+            margin-right: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .thread-view {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button {
+            margin-bottom: 20px;
+        }
+
+        .comments-section {
+            margin-top: 25px;
+        }
+
+        .add-comment {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .admin-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: right;
+        }
+
+        .admin-btn {
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .blurred {
+            filter: blur(5px);
+            user-select: none;
+        }
+
+        .nsfw-warning {
+            text-align: center;
+            padding: 20px;
+            background: #fed7d7;
+            border-radius: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .user-id-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .my-comment {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .creator-controls {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            text-align: right;
+        }
+
+        .refresh-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: #38a169;
+        }
+
+        .last-update {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.8em;
+            margin-top: 10px;
+        }
+
+        .auto-update-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #48bb78;
+            border-radius: 50%;
+            margin-right: 5px;
+            animation: pulse 1s infinite;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 5px;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .favorited {
+            color: #f56565;
+        }
+
+        .not-favorited {
+            color: #cbd5e0;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="mainPage">
+            <div class="header">
+                <div class="logo">NoFace</div>
+                <h1>🕶️ Анонимный Форум</h1>
+                <p class="tagline">Говори то, что думаешь. Без имени, без следа.</p>
+            </div>
+
+            <div class="warning-banner">
+                ⚠️ Внимание: Это демо-версия форума. Для работы с другими пользователями откройте этот файл на общем компьютере.
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('all')">📋 Все обсуждения</button>
+                <button class="tab" onclick="switchTab('my')">👤 Мои обсуждения</button>
+                <button class="tab" onclick="switchTab('favorites')">⭐ Избранные</button>
+            </div>
+
+            <div class="main-content">
+                <div>
+                    <div class="create-thread">
+                        <h2 style="margin-bottom: 20px; color: #4a5568;">💬 Создать новое обсуждение</h2>
+                        <div class="form-group">
+                            <label for="threadTitle">Заголовок:</label>
+                            <input type="text" id="threadTitle" class="form-control" placeholder="О чём хотите поговорить?">
+                        </div>
+                        <div class="form-group">
+                            <label for="threadContent">Текст обсуждения:</label>
+                            <textarea id="threadContent" class="form-control" placeholder="Опишите вашу тему подробнее..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="checkbox" id="nsfwCheckbox" style="margin-right: 10px;">
+                                <span>Пометить как NSFW (18+)</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-primary" onclick="createThread()" id="createThreadBtn">📝 Создать обсуждение</button>
+                    </div>
+
+                    <div class="threads-list">
+                        <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="color: #4a5568; margin: 0;">
+                                <span class="auto-update-indicator"></span>
+                                <span id="currentTabTitle">Все обсуждения</span>
+                            </h2>
+                            <button class="refresh-btn" onclick="loadThreads()">🔄 Обновить</button>
+                        </div>
+                        <div id="threadsContainer">
+                            <div class="empty-state">
+                                <h3>Загрузка...</h3>
+                                <p>Инициализация форума</p>
+                            </div>
+                        </div>
+                        <div class="last-update" id="threadsLastUpdate">
+                            Обновлено: загрузка...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <h3 style="margin-bottom: 15px; color: #4a5568;">📜 Правила сообщества</h3>
+                    <ul class="rules-list">
+                        <li>Запрещены прямые угрозы жизни и здоровью</li>
+                        <li>Запрещено разжигание ненависти</li>
+                        <li>Запрещены призывы к суициду</li>
+                        <li>Запрещена детская порнография</li>
+                        <li>Запрещено распространение личных данных</li>
+                        <li>Запрещены спам и мошенничество</li>
+                    </ul>
+                    
+                    <div style="margin-top: 25px; padding: 15px; background: #edf2f7; border-radius: 10px;">
+                        <h4 style="margin-bottom: 10px; color: #4a5568;">ℹ️ Локальный форум</h4>
+                        <p style="color: #718096; font-size: 0.9em;">
+                            • Все данные хранятся в вашем браузере<br>
+                            • Для работы с другими пользователями:<br>
+                            &nbsp;&nbsp;- Откройте файл на общем компьютере<br>
+                            &nbsp;&nbsp;- Или используйте локальный веб-сервер<br>
+                            • Автообновление каждые 3 секунды<br>
+                            • Полная анонимность
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="threadPage" class="hidden">
+            <div class="back-button">
+                <button class="btn btn-secondary" onclick="showMainPage()">← Назад к списку</button>
+            </div>
+            
+            <div class="thread-view">
+                <div id="threadViewContent">
+                    <!-- Содержимое треда будет здесь -->
+                </div>
+                
+                <div class="comments-section">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: #4a5568; margin: 0;">
+                            <span class="auto-update-indicator"></span>💭 Комментарии
+                        </h3>
+                        <button class="refresh-btn" onclick="loadCurrentThreadComments()">🔄 Обновить</button>
+                    </div>
+                    
+                    <div class="add-comment">
+                        <div class="form-group">
+                            <textarea id="commentContent" class="form-control" placeholder="Напишите ваш комментарий..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="addComment()" id="addCommentBtn">📨 Отправить комментарий</button>
+                        <div style="font-size: 0.8em; color: #718096; margin-top: 5px;">
+                            Ctrl+Enter для быстрой отправки
+                        </div>
+                    </div>
+                    
+                    <div id="commentsContainer">
+                        <div class="empty-state">
+                            <h3>Загрузка комментариев...</h3>
+                        </div>
+                    </div>
+                    <div class="last-update" id="commentsLastUpdate">
+                        Обновлено: загрузка...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ПРОСТАЯ СИСТЕМА ДАННЫХ ====================
+        
+        // Текущая активная вкладка
+        let currentTab = 'all';
+        let currentUser = null;
+        let allThreads = [];
+
+        // Ключи для localStorage
+        const STORAGE_KEYS = {
+            THREADS: 'noface_threads',
+            USER_ID: 'noface_user_id',
+            FAVORITES: 'noface_favorites',
+            MAPPINGS: 'noface_mappings'
+        };
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+        // Инициализация пользователя
+        function initializeUser() {
+            let userId = localStorage.getItem(STORAGE_KEYS.USER_ID);
+            if (!userId) {
+                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem(STORAGE_KEYS.USER_ID, userId);
+            }
+            currentUser = userId;
+            return userId;
+        }
+
+        // Инициализация данных
+        function initializeData() {
+            // Загружаем треды из localStorage
+            const storedThreads = localStorage.getItem(STORAGE_KEYS.THREADS);
+            if (storedThreads) {
+                try {
+                    allThreads = JSON.parse(storedThreads);
+                } catch (e) {
+                    console.error('Ошибка загрузки тредов:', e);
+                    allThreads = [];
+                }
+            }
+
+            // Если тредов нет, создаем демо-тред
+            if (allThreads.length === 0) {
+                allThreads = [createWelcomeThread()];
+                saveThreads();
+            }
+
+            // Инициализируем избранное
+            if (!localStorage.getItem(STORAGE_KEYS.FAVORITES)) {
+                localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify([]));
+            }
+
+            // Инициализируем маппинги
+            if (!localStorage.getItem(STORAGE_KEYS.MAPPINGS)) {
+                localStorage.setItem(STORAGE_KEYS.MAPPINGS, JSON.stringify({}));
+            }
+        }
+
+        // Создание приветственного треда
+        function createWelcomeThread() {
+            return {
+                id: generateId(),
+                title: 'Добро пожаловать на анонимный форум! 🎉',
+                content: 'Это демонстрационное обсуждение. Здесь вы можете:\n\n• Создавать новые темы для обсуждения\n• Комментировать существующие обсуждения\n• Добавлять понравившиеся темы в избранное\n• Общаться полностью анонимно\n\nДля начала создайте своё обсуждение или оставьте комментарий ниже!',
+                timestamp: Date.now(),
+                nsfw: false,
+                creatorId: 'system',
+                comments: [
+                    {
+                        id: generateId(),
+                        authorId: 'system',
+                        author: 'Система',
+                        content: '💡 Просто откройте этот HTML файл на общем компьютере, чтобы видеть сообщения других пользователей!',
+                        timestamp: Date.now() - 60000
+                    }
+                ]
+            };
+        }
+
+        // ==================== УПРАВЛЕНИЕ ДАННЫМИ ====================
+
+        // Сохранение тредов в localStorage
+        function saveThreads() {
+            try {
+                localStorage.setItem(STORAGE_KEYS.THREADS, JSON.stringify(allThreads));
+                // Триггерим событие обновления для других вкладок
+                localStorage.setItem('noface_last_update', Date.now().toString());
+                return true;
+            } catch (e) {
+                console.error('Ошибка сохранения:', e);
+                return false;
+            }
+        }
+
+        // Проверка обновлений из других вкладок
+        function checkForUpdates() {
+            const lastUpdate = localStorage.getItem('noface_last_update');
+            const currentUpdate = localStorage.getItem('noface_current_update') || '0';
+            
+            if (lastUpdate !== currentUpdate) {
+                localStorage.setItem('noface_current_update', lastUpdate);
+                return true;
+            }
+            return false;
+        }
+
+        // Получение ID пользователя для треда
+        function getUserIdForThread(threadId) {
+            const mappings = JSON.parse(localStorage.getItem(STORAGE_KEYS.MAPPINGS) || '{}');
+            const key = `${threadId}_${currentUser}`;
+            
+            if (mappings[key]) {
+                return mappings[key];
+            }
+            
+            // Генерируем новый красивый ID
+            const adjectives = ['Таинственный', 'Неизвестный', 'Скрытый', 'Загадочный', 'Безымянный'];
+            const nouns = ['Странник', 'Наблюдатель', 'Гость', 'Посетитель', 'Собеседник'];
+            const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            const number = Math.floor(Math.random() * 999) + 1;
+            const newId = `${adjective} ${noun} #${number}`;
+            
+            mappings[key] = newId;
+            localStorage.setItem(STORAGE_KEYS.MAPPINGS, JSON.stringify(mappings));
+            
+            return newId;
+        }
+
+        // Генерация ID
+        function generateId() {
+            return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Форматирование времени
+        function getFormattedTime(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'только что';
+            if (minutes < 60) return `${minutes} мин назад`;
+            if (hours < 24) return `${hours} ч назад`;
+            if (days < 7) return `${days} дн назад`;
+            
+            return new Date(timestamp).toLocaleDateString('ru-RU');
+        }
+
+        // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
+
+        // Переключение вкладок
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            document.querySelectorAll('.tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const titles = {
+                'all': 'Все обсуждения',
+                'my': 'Мои обсуждения',
+                'favorites': 'Избранные обсуждения'
+            };
+            document.getElementById('currentTabTitle').textContent = titles[tab];
+            
+            loadThreads();
+        }
+
+        // Проверка, является ли пользователь создателем треда
+        function isThreadCreator(thread) {
+            return thread.creatorId === currentUser;
+        }
+
+        // Проверка избранного
+        function isThreadFavorited(threadId) {
+            const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.FAVORITES) || '[]');
+            return favorites.includes(threadId);
+        }
+
+        // Добавление/удаление из избранного
+        function toggleFavorite(threadId, event) {
+            event.stopPropagation();
+            const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.FAVORITES) || '[]');
+            const index = favorites.indexOf(threadId);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+                showTempMessage('🗑️ Удалено из избранного');
+            } else {
+                favorites.push(threadId);
+                showTempMessage('⭐ Добавлено в избранное');
+            }
+            
+            localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
+            loadThreads();
+        }
+
+        // Загрузка тредов
+        function loadThreads() {
+            try {
+                // Проверяем обновления из других вкладок
+                if (checkForUpdates()) {
+                    const storedThreads = localStorage.getItem(STORAGE_KEYS.THREADS);
+                    if (storedThreads) {
+                        allThreads = JSON.parse(storedThreads);
+                    }
+                }
+                
+                let threadsToShow = [...allThreads];
+                const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.FAVORITES) || '[]');
+                
+                if (currentTab === 'my') {
+                    threadsToShow = threadsToShow.filter(thread => thread.creatorId === currentUser);
+                } else if (currentTab === 'favorites') {
+                    threadsToShow = threadsToShow.filter(thread => favorites.includes(thread.id));
+                }
+                
+                displayThreads(threadsToShow);
+                document.getElementById('threadsLastUpdate').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru-RU');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки тредов:', error);
+                document.getElementById('threadsContainer').innerHTML = `
+                    <div class="error-message">
+                        <h3>Ошибка загрузки</h3>
+                        <p>Попробуйте обновить страницу</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Отображение тредов
+        function displayThreads(threads) {
+            const container = document.getElementById('threadsContainer');
+            
+            if (threads.length === 0) {
+                const messages = {
+                    'all': 'Пока нет обсуждений',
+                    'my': 'У вас пока нет созданных обсуждений',
+                    'favorites': 'У вас пока нет избранных обсуждений'
+                };
+                
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>${messages[currentTab]}</h3>
+                        <p>${currentTab === 'all' ? 'Создайте первое обсуждение!' : 'Вернитесь во вкладку "Все обсуждения"'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = threads.map(thread => {
+                const isCreator = isThreadCreator(thread);
+                const userAnonymousId = getUserIdForThread(thread.id);
+                const isFavorited = isThreadFavorited(thread.id);
+                
+                return `
+                <div class="thread-item" onclick="openThread('${thread.id}')">
+                    <button class="favorite-btn ${isFavorited ? 'favorited' : 'not-favorited'}" 
+                            onclick="toggleFavorite('${thread.id}', event)">
+                        ${isFavorited ? '★' : '☆'}
+                    </button>
+                    <div class="thread-header">
+                        <div class="thread-title">
+                            ${thread.title}
+                            ${thread.nsfw ? '<span class="nsfw-badge">NSFW</span>' : ''}
+                            <span class="user-id-badge">${userAnonymousId}</span>
+                        </div>
+                        <div class="thread-meta">
+                            <span>💬 ${thread.comments?.length || 0}</span>
+                            <span>🕒 ${getFormattedTime(thread.timestamp)}</span>
+                        </div>
+                    </div>
+                    <div class="thread-content">
+                        <div class="thread-preview">${thread.content || 'Без дополнительного текста'}</div>
+                    </div>
+                    ${isCreator ? `
+                    <div class="creator-controls">
+                        <button class="admin-btn" onclick="event.stopPropagation(); deleteThread('${thread.id}')">🗑️ Удалить обсуждение</button>
+                    </div>
+                    ` : ''}
+                </div>
+                `;
+            }).join('');
+        }
+
+        // Создание треда
+        function createThread() {
+            const title = document.getElementById('threadTitle').value.trim();
+            const content = document.getElementById('threadContent').value.trim();
+            const nsfw = document.getElementById('nsfwCheckbox').checked;
+            
+            if (!title) {
+                alert('Пожалуйста, введите заголовок обсуждения');
+                return;
+            }
+            
+            const btn = document.getElementById('createThreadBtn');
+            btn.classList.add('loading');
+            btn.textContent = '📝 Создание...';
+            
+            try {
+                const newThread = {
+                    id: generateId(),
+                    title: title,
+                    content: content,
+                    timestamp: Date.now(),
+                    nsfw: nsfw,
+                    creatorId: currentUser,
+                    comments: []
+                };
+                
+                allThreads.unshift(newThread);
+                
+                if (saveThreads()) {
+                    document.getElementById('threadTitle').value = '';
+                    document.getElementById('threadContent').value = '';
+                    document.getElementById('nsfwCheckbox').checked = false;
+                    
+                    loadThreads();
+                    showTempMessage('✅ Обсуждение создано!');
+                } else {
+                    throw new Error('Ошибка сохранения');
+                }
+                
+            } catch (error) {
+                showTempMessage('❌ Ошибка при создании обсуждения');
+            } finally {
+                btn.classList.remove('loading');
+                btn.textContent = '📝 Создать обсуждение';
+            }
+        }
+
+        // Открытие треда
+        function openThread(threadId) {
+            const thread = allThreads.find(t => t.id === threadId);
+            if (!thread) {
+                alert('Обсуждение не найдено');
+                return;
+            }
+            
+            const userAnonymousId = getUserIdForThread(threadId);
+            const isCreator = isThreadCreator(thread);
+            const isFavorited = isThreadFavorited(threadId);
+            
+            const threadContent = document.getElementById('threadViewContent');
+            threadContent.innerHTML = `
+                <div class="thread-item">
+                    <button class="favorite-btn ${isFavorited ? 'favorited' : 'not-favorited'}" 
+                            onclick="toggleFavorite('${thread.id}', event)">
+                        ${isFavorited ? '★' : '☆'}
+                    </button>
+                    <div class="thread-header">
+                        <div class="thread-title">
+                            ${thread.title}
+                            ${thread.nsfw ? '<span class="nsfw-badge">NSFW</span>' : ''}
+                            <span class="user-id-badge">${userAnonymousId}</span>
+                        </div>
+                        <div class="thread-meta">
+                            <span>🕒 ${getFormattedTime(thread.timestamp)}</span>
+                            <span>💬 ${thread.comments?.length || 0} комментариев</span>
+                        </div>
+                    </div>
+                    <div class="thread-content">
+                        ${thread.nsfw ? `
+                            <div class="nsfw-warning" onclick="this.nextElementSibling.classList.toggle('blurred'); this.style.display='none'">
+                                ⚠️ Контент помечен как NSFW (18+). Нажмите для просмотра.
+                            </div>
+                            <div class="blurred">${thread.content || 'Без дополнительного текста'}</div>
+                        ` : (thread.content || 'Без дополнительного текста')}
+                    </div>
+                    ${isCreator ? `
+                    <div class="creator-controls">
+                        <button class="admin-btn" onclick="deleteThread('${thread.id}')">🗑️ Удалить обсуждение</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            loadComments(threadId);
+            localStorage.setItem('currentThreadId', threadId);
+            document.getElementById('mainPage').classList.add('hidden');
+            document.getElementById('threadPage').classList.remove('hidden');
+        }
+
+        // Загрузка комментариев
+        function loadComments(threadId) {
+            try {
+                const thread = allThreads.find(t => t.id === threadId);
+                if (!thread) return;
+                
+                const container = document.getElementById('commentsContainer');
+                const comments = thread.comments || [];
+                
+                if (comments.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <h3>Пока нет комментариев</h3>
+                            <p>Будьте первым, кто оставит комментарий!</p>
+                        </div>
+                    `;
+                } else {
+                    const sortedComments = [...comments].sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    container.innerHTML = sortedComments.map(comment => {
+                        const isAuthor = comment.authorId === currentUser;
+                        const isCreator = isThreadCreator(thread);
+                        
+                        return `
+                        <div class="comment ${isAuthor ? 'my-comment' : ''}">
+                            <div class="comment-header">
+                                <div class="comment-author">
+                                    ${comment.author}
+                                    ${isAuthor ? ' <span style="color:#667eea;">(Вы)</span>' : ''}
+                                </div>
+                                <div class="comment-time">${getFormattedTime(comment.timestamp)}</div>
+                            </div>
+                            <div class="comment-content">${comment.content}</div>
+                            ${(isAuthor || isCreator) ? `
+                            <div class="admin-controls">
+                                <button class="admin-btn" onclick="deleteComment('${threadId}', '${comment.id}')">🗑️ Удалить</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                        `;
+                    }).join('');
+                }
+                
+                document.getElementById('commentsLastUpdate').textContent = 'Обновлено: ' + new Date().toLocaleTimeString('ru-RU');
+                
+            } catch (error) {
+                console.error('Ошибка загрузки комментариев:', error);
+            }
+        }
+
+        // Загрузка комментариев текущего треда
+        function loadCurrentThreadComments() {
+            const threadId = localStorage.getItem('currentThreadId');
+            if (threadId) {
+                loadComments(threadId);
+            }
+        }
+
+        // Добавление комментария
+        function addComment() {
+            const threadId = localStorage.getItem('currentThreadId');
+            const content = document.getElementById('commentContent').value.trim();
+            
+            if (!content) {
+                alert('Пожалуйста, введите текст комментария');
+                return;
+            }
+            
+            if (!threadId) {
+                alert('Ошибка: обсуждение не найдено');
+                return;
+            }
+            
+            const btn = document.getElementById('addCommentBtn');
+            btn.classList.add('loading');
+            btn.textContent = '📨 Отправка...';
+            
+            try {
+                const thread = allThreads.find(t => t.id === threadId);
+                if (!thread) {
+                    throw new Error('Обсуждение не найдено');
+                }
+                
+                const userAnonymousId = getUserIdForThread(threadId);
+                
+                const newComment = {
+                    id: generateId(),
+                    authorId: currentUser,
+                    author: userAnonymousId,
+                    content: content,
+                    timestamp: Date.now()
+                };
+                
+                if (!thread.comments) {
+                    thread.comments = [];
+                }
+                
+                thread.comments.push(newComment);
+                
+                if (saveThreads()) {
+                    document.getElementById('commentContent').value = '';
+                    loadComments(threadId);
+                    showTempMessage('✅ Комментарий добавлен!');
+                } else {
+                    throw new Error('Ошибка сохранения');
+                }
+                
+            } catch (error) {
+                showTempMessage('❌ Ошибка при добавлении комментария');
+            } finally {
+                btn.classList.remove('loading');
+                btn.textContent = '📨 Отправить комментарий';
+            }
+        }
+
+        // Удаление треда
+        function deleteThread(threadId) {
+            if (!confirm('Вы уверены, что хотите удалить это обсуждение? Все комментарии также будут удалены.')) {
+                return;
+            }
+            
+            try {
+                allThreads = allThreads.filter(t => t.id !== threadId);
+                
+                // Удаляем из избранного
+                const favorites = JSON.parse(localStorage.getItem(STORAGE_KEYS.FAVORITES) || '[]');
+                const updatedFavorites = favorites.filter(fav => fav !== threadId);
+                localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(updatedFavorites));
+                
+                if (saveThreads()) {
+                    if (localStorage.getItem('currentThreadId') === threadId) {
+                        showMainPage();
+                    }
+                    
+                    loadThreads();
+                    showTempMessage('🗑️ Обсуждение удалено');
+                } else {
+                    throw new Error('Ошибка сохранения');
+                }
+                
+            } catch (error) {
+                showTempMessage('❌ Ошибка при удалении обсуждения');
+            }
+        }
+
+        // Удаление комментария
+        function deleteComment(threadId, commentId) {
+            if (!confirm('Удалить этот комментарий?')) {
+                return;
+            }
+            
+            try {
+                const thread = allThreads.find(t => t.id === threadId);
+                if (thread && thread.comments) {
+                    thread.comments = thread.comments.filter(c => c.id !== commentId);
+                    
+                    if (saveThreads()) {
+                        loadComments(threadId);
+                        showTempMessage('🗑️ Комментарий удален');
+                    } else {
+                        throw new Error('Ошибка сохранения');
+                    }
+                }
+            } catch (error) {
+                showTempMessage('❌ Ошибка при удалении комментария');
+            }
+        }
+
+        // Показать главную страницу
+        function showMainPage() {
+            document.getElementById('mainPage').classList.remove('hidden');
+            document.getElementById('threadPage').classList.add('hidden');
+            localStorage.removeItem('currentThreadId');
+        }
+
+        // Временное сообщение
+        function showTempMessage(message) {
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #48bb78;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                z-index: 1000;
+                font-weight: 600;
+            `;
+            tempDiv.textContent = message;
+            document.body.appendChild(tempDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(tempDiv);
+            }, 3000);
+        }
+
+        // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUser();
+            initializeData();
+            loadThreads();
+            
+            // Обработка Enter для создания треда
+            document.getElementById('threadTitle').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    createThread();
+                }
+            });
+
+            // Обработка Ctrl+Enter для комментария
+            document.getElementById('commentContent').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    addComment();
+                }
+            });
+
+            // Автообновление каждые 3 секунды
+            setInterval(() => {
+                loadThreads();
+                if (localStorage.getItem('currentThreadId')) {
+                    loadCurrentThreadComments();
+                }
+            }, 3000);
+
+            // Слушаем события storage для обновления между вкладками
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'noface_last_update') {
+                    loadThreads();
+                    if (localStorage.getItem('currentThreadId')) {
+                        loadCurrentThreadComments();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
